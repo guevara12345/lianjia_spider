@@ -58,7 +58,7 @@ def get_house_4_sale():
         path = os.path.join(proj_path, 'data/{}/house_url_page{}.html'.format(key, 1))
         with open(path, 'r') as f:
             page_num = src.parser1.parse_max_page_num(f.read())
-            for i in range(page_num):
+            for i in range(page_num-1):
                 url = urljoin(district_url_map[key], 'pg{}{}'.format(i+2, bond))
                 path = os.path.join(proj_path, 'data/{}/house_url_page{}.html'.format(key, i+2))
                 src.downloader1.download_html(url, path)
