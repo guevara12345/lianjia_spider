@@ -6,7 +6,7 @@ import os
 #import src.db_helper
 
 
-tb_house_info = ['id', 'code', 'region']
+tb_house_info = ['id', 'code', 'xiaoqu', 'room', 'area', 'orientations', 'decoration', 'is_elevator', 'region', 'floor', '', '', '', '', '', '', '', '']
 
 
 proj_path = os.path.abspath('..')
@@ -24,26 +24,41 @@ def parse_max_page_num(html):
 
 def parse_house_url(html):
     list_url=[]
+    list_dict_house_info=[]
     dict_house_info = dict()
     soup = BeautifulSoup(html, 'html.parser')
     l_tag = soup.find_all('div', 'info clear')
+    # get house detail info url list
     for i1 in l_tag:
+
         l = i1.find('div', 'title').a.attrs
         list_url.append(l['href'])
+    # get list of dict_house_info
     for i2 in l_tag:
+        #fill dict_house_info
         #code for 房屋代码
         dict_house_info['code'] = i2.find('div', 'title').a.attrs['data-housecode']
-        # region for 小区
-        dict_house_info['region'] = i2.find('div', 'houseInfo').a.string
-        m = re.match(r'<a.*?>(.+?)</a><span class="divide">/</span>(.*?)<span class="divide">/</span>'
-                 r'(.*?)<span class="divide">/</span>(.*?)<span class="divide">/</span>'
-                 r'(.*?)<span class="divide">/</span>(.*?)$', i2.find('div', 'houseInfo').string)
-        dict_house_info[''] = m.group(1)
-        dict_house_info[''] = m.group(2)
-        dict_house_info[''] = m.group(3)
-        dict_house_info[''] = m.group(4)
-        dict_house_info[''] = m.group(5)
-        dict_house_info[''] = m.group(6)
+        m = re.match(r'(.+?)/(.*?)/(.*?)/(.*?)/(.*?)/(.*?)', i2.find('div', 'houseInfo').text)
+        #xiaoqu for 小区
+        dict_house_info['xiaoqu'] = m.group(1)
+        #room like 两室一厅
+        dict_house_info['room'] = m.group(2)
+        #area for 面积
+        dict_house_info['area'] = m.group(3)
+        #orientations for 朝向
+        dict_house_info['orientations'] = m.group(4)
+        #decoration like 精装
+        dict_house_info['decoration'] = m.group(5)
+        #is_elevator like 有电梯
+        dict_house_info['is_elevator'] = m.group(6)
+        #region like 清河
+        dict_house_info['region'] = i2.find('div', 'positionInfo').a.string
+        m = re.match(r'(.*?)<span.*?>/</span>(.*?)<span.*?>/</span>(.*?).*?$', i2.find('div', 'positionInfo').string)
+        #floor like 顶层(共13层)
+        dict_house_info['floor'] = m.group(1)
+        # building like 2003年建塔楼
+        dict_house_info['building'] = m.group(2)
+        list_dict_house_info.append(dict_house_info)
     return (list_url, dict_house_info)
 
 def persis_house_abbr_info():

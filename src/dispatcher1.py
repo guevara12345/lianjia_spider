@@ -40,12 +40,13 @@ def mkdir4house_url_page():
     for k in district_url_map:
         path = os.path.join(proj_path, 'data/{}'.format(k))
         if not os.path.isdir(path):
-            os.mkdir(path)
+            os.makedirs(path)
 
 
 '''
-1.下载并解析各区挂出二手房第一页，获取各区二手房挂出的页面数
-2.根据页数，下载各区二手房信息    
+1
+#下载并解析各区挂出二手房第一页，获取各区二手房挂出的页面数
+#根据页数，下载各区二手房信息    
 '''
 def get_house_4_sale():
     #1
@@ -62,9 +63,18 @@ def get_house_4_sale():
                 url = urljoin(district_url_map[key], 'pg{}{}'.format(i+2, bond))
                 path = os.path.join(proj_path, 'data/{}/house_url_page{}.html'.format(key, i+2))
                 src.downloader1.download_html(url, path)
+'''
+2
+'''
+def get_more_house_info():
+    pass
 
 
 if __name__ == '__main__':
     mkdir4house_url_page()
     get_house_4_sale()
+    src.parser1.parse_house_url()
+    src.parser1.persis_house_abbr_info()
+
+
 
