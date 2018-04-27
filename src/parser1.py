@@ -31,12 +31,19 @@ def parse_house_url(html):
         l = i1.find('div', 'title').a.attrs
         list_url.append(l['href'])
     for i2 in l_tag:
+        #code for 房屋代码
         dict_house_info['code'] = i2.find('div', 'title').a.attrs['data-housecode']
+        # region for 小区
         dict_house_info['region'] = i2.find('div', 'houseInfo').a.string
-        re.match(r'<a.*?>(.+?)</a><span class="divide">/</span>(.*?)<span class="divide">/</span>'
+        m = re.match(r'<a.*?>(.+?)</a><span class="divide">/</span>(.*?)<span class="divide">/</span>'
                  r'(.*?)<span class="divide">/</span>(.*?)<span class="divide">/</span>'
                  r'(.*?)<span class="divide">/</span>(.*?)$', i2.find('div', 'houseInfo').string)
-        dict_house_info['']=
+        dict_house_info[''] = m.group(1)
+        dict_house_info[''] = m.group(2)
+        dict_house_info[''] = m.group(3)
+        dict_house_info[''] = m.group(4)
+        dict_house_info[''] = m.group(5)
+        dict_house_info[''] = m.group(6)
     return (list_url, dict_house_info)
 
 def persis_house_abbr_info():
