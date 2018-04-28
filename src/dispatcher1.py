@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 from requests.exceptions import Timeout, RequestException
 import os
+import re
 
 
 import src.downloader1
@@ -41,6 +42,9 @@ def mkdir4house_url_page():
         path = os.path.join(proj_path, 'data/{}'.format(k))
         if not os.path.isdir(path):
             os.makedirs(path)
+        path = os.path.join(proj_path, 'data/house_detail'.format(k))
+        if not os.path.isdir(path):
+            os.makedirs(path)
 
 
 '''
@@ -48,7 +52,7 @@ def mkdir4house_url_page():
 #下载并解析各区挂出二手房第一页，获取各区二手房挂出的页面数
 #根据页数，下载各区二手房信息    
 '''
-def get_house_4_sale():
+def download_house_4_sale():
     #1
     for key in district_url_map:
         url = urljoin(district_url_map[key], 'pg{}{}'.format(1, bond))
@@ -66,15 +70,27 @@ def get_house_4_sale():
 '''
 2
 '''
-def get_more_house_info():
-    pass
+def download_house_info(l_url):
+    for i in  l_url:
+        f_name = re.match(r'https.*/(.*)$', i).group(1)
+        path = os.path.join(proj_path, 'data/house_detail/{}'.format(f_name))
+        src.downloader1.download_html(i, path)
+
+#main of this proj
+def lianjia_spider_dispatcher():
+    mkdir4house_url_page()
+    #download_house_4_sale()
+    for k in district_url_map:
+        dir_path = os.path.join(proj_path, 'data/{}'.format(k))
+        for file in os.listdir(dir_path):
+            file_path = os.path.join(dir_path, file)
+            if os.path.isfile(file_path):
+                with open(file_path, 'r') as f:
+                    l_url, l_d_info = src.parser1.parse_house_url(f.read())
+                    download_house_info(l_url)
+                    src.parser1.persis_house_abbr_info(l_d_info)
+
 
 
 if __name__ == '__main__':
-    mkdir4house_url_page()
-    get_house_4_sale()
-    src.parser1.parse_house_url()
-    src.parser1.persis_house_abbr_info()
-
-
-
+    lianjia_spider_dispatcher()
