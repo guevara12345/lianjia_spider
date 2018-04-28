@@ -45,5 +45,8 @@ class DbExeu(object):
             con.close()
 
 
-if __name__ == '__main__':
+#creat the datebase and table
+if __name__=='__main__':
+    obj=DbExeu()
+    obj.get_start('creat database if not exists db_lianjia')
 
