@@ -65,47 +65,48 @@ class HouseInfoHandler:
         return r
 
     def persis_house_info(self, dict_house_info):
-        db = src.db_helper.DbExeu()
-        exists_sql = '''select * from tb_house_info where code=%s'''
-        insert_sql = '''insert into tb_house_info(code,total_price,unit_price,room,floor, build_area,huxing,house_area,orientations, buiding_texture,decoration, elevator_house_proportion,heating,is_elevator, property_right,building_type, xiaoqu,region,guapai_time, property_type,last_deal_time, house_usage,deal_year,property_ownership,mortgage) 
-                     values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
-        update_sql = '''
-                UPDATE tb_house_info SET total_price=%s,
-                         unit_price=%s,
-                         room=%s,
-                         floor=%s,
-                         build_area=%s,
-                         huxing=%s,
-                         house_area=%s,
-                         orientations=%s,
-                         buiding_texture=%s,
-                         decoration=%s,
-                         elevator_house_proportion=%s,
-                         heating=%s,
-                         is_elevator=%s,
-                         property_right=%s,
-                         building_type=%s,
-                         xiaoqu=%s,
-                         region=%s,
-                         guapai_time=%s,
-                         property_type=%s,
-                         last_deal_time=%s,
-                         house_usage=%s,
-                         deal_year=%s,
-                         property_ownership=%s,
-                         mortgage=%s
-                WHERE code=%s'''
-        if db.return_many_with_para(exists_sql, dict_house_info['code'])[1] == 0:
-            t_inser = tuple([str(dict_house_info[tb_house_info[x]]) for x in range(len(tb_house_info))])
-            db.trans(insert_sql, [t_inser, ])
-        else:
-            l_update = []
-            for x in range(len(tb_house_info)):
-                if not x == 0:
-                    l_update.append(str(dict_house_info[tb_house_info[x]]))
-            l_update.append(str(dict_house_info[tb_house_info[0]]))
-            db.trans(update_sql, [tuple(l_update), ])
-        print('persist data.code = {}'.format(dict_house_info['code']))
+        if not dict_house_info == None:
+            db = src.db_helper.DbExeu()
+            exists_sql = '''select * from tb_house_info where code=%s'''
+            insert_sql = '''insert into tb_house_info(code,total_price,unit_price,room,floor, build_area,huxing,house_area,orientations, buiding_texture,decoration, elevator_house_proportion,heating,is_elevator, property_right,building_type, xiaoqu,region,guapai_time, property_type,last_deal_time, house_usage,deal_year,property_ownership,mortgage) 
+                         values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+            update_sql = '''
+                    UPDATE tb_house_info SET total_price=%s,
+                             unit_price=%s,
+                             room=%s,
+                             floor=%s,
+                             build_area=%s,
+                             huxing=%s,
+                             house_area=%s,
+                             orientations=%s,
+                             buiding_texture=%s,
+                             decoration=%s,
+                             elevator_house_proportion=%s,
+                             heating=%s,
+                             is_elevator=%s,
+                             property_right=%s,
+                             building_type=%s,
+                             xiaoqu=%s,
+                             region=%s,
+                             guapai_time=%s,
+                             property_type=%s,
+                             last_deal_time=%s,
+                             house_usage=%s,
+                             deal_year=%s,
+                             property_ownership=%s,
+                             mortgage=%s
+                    WHERE code=%s'''
+            if db.return_many_with_para(exists_sql, dict_house_info['code'])[1] == 0:
+                t_inser = tuple([str(dict_house_info[tb_house_info[x]]) for x in range(len(tb_house_info))])
+                db.trans(insert_sql, [t_inser, ])
+            else:
+                l_update = []
+                for x in range(len(tb_house_info)):
+                    if not x == 0:
+                        l_update.append(str(dict_house_info[tb_house_info[x]]))
+                l_update.append(str(dict_house_info[tb_house_info[0]]))
+                db.trans(update_sql, [tuple(l_update), ])
+            print('persist data.code = {}'.format(dict_house_info['code']))
 
     def parse_house_url(self, html, path):
         try:
@@ -185,7 +186,7 @@ class HouseInfoHandler:
             return dict_house_info
         except Exception as e:
             print('pasre {}\nException: {}'.format(path, e))
-            raise e
+            #raise e
 
 
 class XiaoquInfoHandler:

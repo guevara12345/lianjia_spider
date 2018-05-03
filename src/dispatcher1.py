@@ -10,8 +10,8 @@ from src.downloader1 import HtmlDownloader
 from src.parser1 import HouseInfoHandler, XiaoquInfoHandler, RegionInfoHandler
 
 
-max_price = 800
-min_price = 600
+max_price = 850
+min_price = 650
 build_age = {'0-5': 'y1', '0-10': 'y2', '0-15': 'y3', '0-20': 'y4', }
 house_type = {'1': 'l1', '2': 'l2', '3': 'l3', '4': 'l4'}
 bond = '{}{}bp{}ep{}'.format(build_age['0-15'], house_type['2'], min_price, max_price)
@@ -108,9 +108,10 @@ def down_load_xiaoqu_detail(l_url):
 
 #main of this proj
 def lianjia_spider_dispatcher():
+
     mkdir4house_url_page()
     # get house 4 sale info
-
+    """
     download_house_4_sale_url()
     # get region_info
     for k in district_url_map:
@@ -129,7 +130,7 @@ def lianjia_spider_dispatcher():
                 with open(html_path, 'r') as f:
                     l_url = HouseInfoHandler().parse_house_url(f.read(), html_path)
                     download_house_info(l_url)
-
+    """
     #parse and persist house_info_detail
     info_path = os.path.join(proj_path, 'data/house_detail')
     for file in os.listdir(info_path):
@@ -139,8 +140,6 @@ def lianjia_spider_dispatcher():
                 r = HouseInfoHandler().parse_house_info(f.read(), file_path)
                 HouseInfoHandler().persis_house_info(r)
     #get xiaoqu info
-
-
 
 if __name__ == '__main__':
     lianjia_spider_dispatcher()

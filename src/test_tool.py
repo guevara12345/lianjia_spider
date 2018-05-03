@@ -21,6 +21,8 @@ def select():
         WHERE t.region = s.region
             AND house_usage = '普通住宅'
             AND s.is_too_far = 0
+            AND t.total_price>'650'
+            AND t.total_price<'850'
         ORDER BY region, xiaoqu
         '''
     r = db_hanlder.return_many_without_para(sql)
