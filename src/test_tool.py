@@ -3,18 +3,18 @@ import csv
 import os
 import time
 
-tb_house_info = ['code','total_price','unit_price','room',
-                 'floor','build_area','huxing','house_area','orientations',
-                 'buiding_texture','decoration','elevator_house_proportion','heating','is_elevator',
-                 'property_right','building_type','xiaoqu','region','guapai_time',
-                 'property_type','last_deal_time','house_usage','deal_year','property_ownership',
-                 'mortgage']
+coloum = ['code','total_price','unit_price','room',
+         'floor','build_area','huxing','house_area','orientations',
+         'buiding_texture','decoration','elevator_house_proportion','heating','is_elevator',
+         'property_right','building_type','xiaoqu','region','guapai_time',
+         'property_type','last_deal_time','house_usage','deal_year','property_ownership',
+         'mortgage','is_expire']
 proj_path = os.path.abspath('..')
 
 def select():
     db_hanlder = src.db_helper.DbExeu()
     sql = '''
-        SELECT t.xiaoqu, t.total_price, t.unit_price, t.region, t.build_area
+        SELECT t.xiaoqu, CONCAT(t.total_price, '万'), t.unit_price, t.region, t.build_area
             , t.house_area, t.room, t.orientations, t.guapai_time
             , CONCAT('https://bj.lianjia.com/ershoufang/', t.code, '.html')
         FROM tb_house_info t, tb_region_info s
@@ -23,6 +23,7 @@ def select():
             AND s.is_too_far = 0
             AND t.total_price>'650'
             AND t.total_price<'850'
+            AND t.is_expire='0'
         ORDER BY region, xiaoqu
         '''
     r = db_hanlder.return_many_without_para(sql)
@@ -34,7 +35,7 @@ def select():
         f_csv.writerows(i)
 
 
-def select_region():
+def select_test():
     db_hanlder = src.db_helper.DbExeu()
     sql = '''select * from tb_region_info'''
     r = db_hanlder.return_many_without_para(sql)
@@ -42,8 +43,11 @@ def select_region():
     sql = '''select * from tb_region_info where region=%s'''
     r = db_hanlder.return_many_with_para(sql, ('三里屯'))
     print(r)
+    sql = '''select * from tb_house_info where code=%s'''
+    r = db_hanlder.return_many_with_para(sql, ('101102646140'))
+    print(r)
 
 
 if __name__=='__main__':
     select()
-    #select_region()
+    select_test()

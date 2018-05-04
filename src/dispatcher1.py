@@ -6,6 +6,7 @@ import os
 import re
 
 
+import src.test_tool
 from src.downloader1 import HtmlDownloader
 from src.parser1 import HouseInfoHandler, XiaoquInfoHandler, RegionInfoHandler
 
@@ -140,6 +141,11 @@ def lianjia_spider_dispatcher():
                 r = HouseInfoHandler().parse_house_info(f.read(), file_path)
                 HouseInfoHandler().persis_house_info(r)
     #get xiaoqu info
+
+    #get deal_info
+
+    #display result
+    src.test_tool.select()
 
 if __name__ == '__main__':
     lianjia_spider_dispatcher()

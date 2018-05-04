@@ -13,7 +13,7 @@ tb_house_info = ['code','total_price','unit_price','room',
                  'buiding_texture','decoration','elevator_house_proportion','heating','is_elevator',
                  'property_right','building_type','xiaoqu','region','guapai_time',
                  'property_type','last_deal_time','house_usage','deal_year','property_ownership',
-                 'mortgage']
+                 'mortgage', 'is_expire']
 proj_path = os.path.abspath('..')
 
 
@@ -64,12 +64,17 @@ class HouseInfoHandler:
         print('parse {}, {} page of html'.format(path, r))
         return r
 
+    def is_exist_in_house_info(self, code):
+        db = src.db_helper.DbExeu()
+        exists_sql = '''select * from tb_house_info where code=%s'''
+        return db.return_many_with_para(exists_sql, code)[1]
+
     def persis_house_info(self, dict_house_info):
-        if not dict_house_info == None:
-            db = src.db_helper.DbExeu()
-            exists_sql = '''select * from tb_house_info where code=%s'''
-            insert_sql = '''insert into tb_house_info(code,total_price,unit_price,room,floor, build_area,huxing,house_area,orientations, buiding_texture,decoration, elevator_house_proportion,heating,is_elevator, property_right,building_type, xiaoqu,region,guapai_time, property_type,last_deal_time, house_usage,deal_year,property_ownership,mortgage) 
-                         values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+        db = src.db_helper.DbExeu()
+        if dict_house_info['is_expire'] == '0':
+
+            insert_sql = '''insert into tb_house_info(code,total_price,unit_price,room,floor, build_area,huxing,house_area,orientations, buiding_texture,decoration, elevator_house_proportion,heating,is_elevator, property_right,building_type, xiaoqu,region,guapai_time, property_type,last_deal_time, house_usage,deal_year,property_ownership,mortgage,is_expire) 
+                         values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
             update_sql = '''
                     UPDATE tb_house_info SET total_price=%s,
                              unit_price=%s,
@@ -94,9 +99,10 @@ class HouseInfoHandler:
                              house_usage=%s,
                              deal_year=%s,
                              property_ownership=%s,
-                             mortgage=%s
+                             mortgage=%s,
+                             is_expire=%s
                     WHERE code=%s'''
-            if db.return_many_with_para(exists_sql, dict_house_info['code'])[1] == 0:
+            if self.is_exist_in_house_info(dict_house_info['code']) == 0:
                 t_inser = tuple([str(dict_house_info[tb_house_info[x]]) for x in range(len(tb_house_info))])
                 db.trans(insert_sql, [t_inser, ])
             else:
@@ -106,7 +112,13 @@ class HouseInfoHandler:
                         l_update.append(str(dict_house_info[tb_house_info[x]]))
                 l_update.append(str(dict_house_info[tb_house_info[0]]))
                 db.trans(update_sql, [tuple(l_update), ])
-            print('persist data.code = {}'.format(dict_house_info['code']))
+        else:
+            if not self.is_exist_in_house_info(dict_house_info['code']) == 0:
+                update_sql='''
+                        UPDATE tb_house_info SET is_expire=%s
+                        WHERE code=%s'''
+                db.trans(update_sql, [(dict_house_info['is_expire'],dict_house_info['code']), ])
+        print('persist data.code = {}'.format(dict_house_info['code']))
 
     def parse_house_url(self, html, path):
         try:
@@ -124,13 +136,19 @@ class HouseInfoHandler:
             raise e
 
     def parse_house_info(self, html, path):
-        try:
-            dict_house_info = dict()
-            soup = BeautifulSoup(html, 'html.parser')
-            overview = soup.find('div', 'overview').find('div', 'content')
-            basic = soup.find('div', 'm-content').find('div', 'base')
-            transaction = soup.find('div', 'm-content').find('div', 'transaction')
+        soup = BeautifulSoup(html, 'html.parser')
+        is_expire = soup.find('div', 'title-wrapper').find('span').string
+        dict_house_info = dict()
+        overview = soup.find('div', 'overview').find('div', 'content')
+        basic = soup.find('div', 'm-content').find('div', 'base')
+        transaction = soup.find('div', 'm-content').find('div', 'transaction')
+        if is_expire == '已下架':
+            dict_house_info['is_expire'] = '1'
+            dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
+        else:
             # fill dict_house_info
+            #not下架
+            dict_house_info['is_expire'] = '0'
             # code for 房屋代码
             dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
             # total_price for 总价
@@ -183,10 +201,7 @@ class HouseInfoHandler:
             # mortgage is 抵押信息
             dict_house_info['mortgage'] = transaction.find_all('li')[6].find_all('span')[1].attrs['title']
             print('parse {}'.format(path))
-            return dict_house_info
-        except Exception as e:
-            print('pasre {}\nException: {}'.format(path, e))
-            #raise e
+        return dict_house_info
 
 
 class XiaoquInfoHandler:
@@ -201,13 +216,23 @@ class XiaoquInfoHandler:
         pass
 
 
+class DealInfoHandlre:
+
+    def log_in(self):
+        pass
+    def parse_deal_info(self):
+        pass
+    def persist_deal_info(self):
+        pass
+
+
 if __name__ == '__main__':
     with open(os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_url(f.read(),
                                                os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'))
-    with open(os.path.join(proj_path, u'data/house_detail/101102803649.html'), 'r') as f:
+    with open(os.path.join(proj_path, u'data/house_detail/101101926862.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_info(f.read(),
-                                                os.path.join(proj_path, u'data/house_detail/101102803649.html'))
+                                                os.path.join(proj_path, u'data/house_detail/101101926862.html'))
         HouseInfoHandler().persis_house_info(r)
     with open(os.path.join(proj_path, u'data/朝阳/house_url/house_url_page1.html'), 'r') as f:
         r = RegionInfoHandler().parse_region(f.read(),

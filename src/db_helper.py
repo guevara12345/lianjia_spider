@@ -94,7 +94,8 @@ if __name__=='__main__':
             last_deal_time varchar(100),
             house_usage varchar(100),
             deal_year varchar(100),
-            property_ownership varchar(100))
+            property_ownership varchar(100),
+            is_expire varchar(100))
             default charset=utf8;
             '''
     sql2 = '''
