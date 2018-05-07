@@ -105,6 +105,15 @@ if __name__=='__main__':
             is_too_far int)
             default charset=utf8; 
     '''
+    sql3 = '''
+        CREATE TABLE IF NOT EXISTS tb_price_change (
+            timestamp varchar(100) PRIMARY KEY UNIQUE,
+            code varchar(100),
+            total_price varchar(100),
+            price_change varchar(100),
+            datetime varchar(100))
+            default charset=utf8; 
+    '''
     obj.get_start(sql1)
     obj.get_start(sql2)
-
+    obj.get_start(sql3)

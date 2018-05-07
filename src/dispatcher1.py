@@ -15,7 +15,7 @@ max_price = 850
 min_price = 650
 build_age = {'0-5': 'y1', '0-10': 'y2', '0-15': 'y3', '0-20': 'y4', }
 house_type = {'1': 'l1', '2': 'l2', '3': 'l3', '4': 'l4'}
-bond = '{}{}bp{}ep{}'.format(build_age['0-15'], house_type['2'], min_price, max_price)
+bond = '{}{}bp{}ep{}'.format(build_age['0-20'], house_type['2'], min_price, max_price)
 
 
 district_url_map = {
@@ -112,7 +112,7 @@ def lianjia_spider_dispatcher():
 
     mkdir4house_url_page()
     # get house 4 sale info
-    """
+    '''
     download_house_4_sale_url()
     # get region_info
     for k in district_url_map:
@@ -131,7 +131,7 @@ def lianjia_spider_dispatcher():
                 with open(html_path, 'r') as f:
                     l_url = HouseInfoHandler().parse_house_url(f.read(), html_path)
                     download_house_info(l_url)
-    """
+    '''
     #parse and persist house_info_detail
     info_path = os.path.join(proj_path, 'data/house_detail')
     for file in os.listdir(info_path):
@@ -142,7 +142,6 @@ def lianjia_spider_dispatcher():
                 HouseInfoHandler().persis_house_info(r)
     #get xiaoqu info
 
-    #get deal_info
 
     #display result
     src.test_tool.select()

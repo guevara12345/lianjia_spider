@@ -3,6 +3,8 @@
 from bs4 import BeautifulSoup
 import re
 import os
+from datetime import date
+import time
 
 
 import src.db_helper
@@ -67,12 +69,14 @@ class HouseInfoHandler:
     def is_exist_in_house_info(self, code):
         db = src.db_helper.DbExeu()
         exists_sql = '''select * from tb_house_info where code=%s'''
-        return db.return_many_with_para(exists_sql, code)[1]
+        return db.return_many_with_para(exists_sql, code)
+
+
 
     def persis_house_info(self, dict_house_info):
         db = src.db_helper.DbExeu()
+        info = self.is_exist_in_house_info(dict_house_info['code'])
         if dict_house_info['is_expire'] == '0':
-
             insert_sql = '''insert into tb_house_info(code,total_price,unit_price,room,floor, build_area,huxing,house_area,orientations, buiding_texture,decoration, elevator_house_proportion,heating,is_elevator, property_right,building_type, xiaoqu,region,guapai_time, property_type,last_deal_time, house_usage,deal_year,property_ownership,mortgage,is_expire) 
                          values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
             update_sql = '''
@@ -102,10 +106,21 @@ class HouseInfoHandler:
                              mortgage=%s,
                              is_expire=%s
                     WHERE code=%s'''
-            if self.is_exist_in_house_info(dict_house_info['code']) == 0:
+            if info[1] == 0:
                 t_inser = tuple([str(dict_house_info[tb_house_info[x]]) for x in range(len(tb_house_info))])
                 db.trans(insert_sql, [t_inser, ])
             else:
+                if not info[0][0][2] == dict_house_info['total_price']:
+                    price_change = int(dict_house_info['total_price'])-int(info[0][0][2])
+                    datetime = date.today().isoformat()
+                    timestamp = int(time.time()*1000)
+                    change_insert = '''
+                        insert into tb_price_change(timestamp, code, total_price, price_change, datetime) values (%s, %s, %s, %s, %s)
+                    '''
+                    insert_date=[(timestamp, dict_house_info['code'], dict_house_info['total_price'], price_change, datetime),]
+                    db.trans(change_insert, insert_date)
+                    print('{} change {}'.format(dict_house_info['code'], price_change))
+
                 l_update = []
                 for x in range(len(tb_house_info)):
                     if not x == 0:
@@ -113,7 +128,7 @@ class HouseInfoHandler:
                 l_update.append(str(dict_house_info[tb_house_info[0]]))
                 db.trans(update_sql, [tuple(l_update), ])
         else:
-            if not self.is_exist_in_house_info(dict_house_info['code']) == 0:
+            if not info[1] == 0:
                 update_sql='''
                         UPDATE tb_house_info SET is_expire=%s
                         WHERE code=%s'''
@@ -216,26 +231,17 @@ class XiaoquInfoHandler:
         pass
 
 
-class DealInfoHandlre:
-
-    def log_in(self):
-        pass
-    def parse_deal_info(self):
-        pass
-    def persist_deal_info(self):
-        pass
-
-
 if __name__ == '__main__':
     with open(os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_url(f.read(),
                                                os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'))
-    with open(os.path.join(proj_path, u'data/house_detail/101101926862.html'), 'r') as f:
+    with open(os.path.join(proj_path, u'data/house_detail/101091836246.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_info(f.read(),
-                                                os.path.join(proj_path, u'data/house_detail/101101926862.html'))
+                                                os.path.join(proj_path, u'data/house_detail/101091836246.html'))
         HouseInfoHandler().persis_house_info(r)
+        print(r)
     with open(os.path.join(proj_path, u'data/朝阳/house_url/house_url_page1.html'), 'r') as f:
         r = RegionInfoHandler().parse_region(f.read(),
                                              os.path.join(proj_path, u'data/朝阳/house_url/house_url_page1.html'))
         RegionInfoHandler().persist_region(r)
-        print(r)
+        #print(r)

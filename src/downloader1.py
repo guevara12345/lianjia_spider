@@ -18,7 +18,7 @@ class HtmlDownloader:
 
     def download_html(self, url, file_path):
         try:
-            time.sleep(1)
+            time.sleep(0)
             rsp = requests.get(url, timeout=5, headers=HEADERS)
             if 200 == rsp.status_code:
                 with open(file_path, 'w', encoding='utf-8') as f:
