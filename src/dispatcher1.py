@@ -19,8 +19,8 @@ bond = '{}{}bp{}ep{}'.format(build_age['0-20'], house_type['2'], min_price, max_
 
 
 district_url_map = {
-#    u'东城': 'https://bj.lianjia.com/ershoufang/dongcheng/',
-#    u'西城': 'https://bj.lianjia.com/ershoufang/xicheng/',
+    u'东城': 'https://bj.lianjia.com/ershoufang/dongcheng/',
+    u'西城': 'https://bj.lianjia.com/ershoufang/xicheng/',
     u'朝阳': 'https://bj.lianjia.com/ershoufang/chaoyang/',
     u'海淀': 'https://bj.lianjia.com/ershoufang/haidian/',
 #    u'丰台': 'https://bj.lianjia.com/ershoufang/fengtai/',
@@ -29,8 +29,8 @@ district_url_map = {
 #    u'昌平': 'https://bj.lianjia.com/ershoufang/changping/'
     }
 xiaoqu_district_url_map = {
-#    u'东城': 'https://bj.lianjia.com/xiaoqu/dongcheng/',
-#    u'西城': 'https://bj.lianjia.com/xiaoqu/xicheng/',
+    u'东城': 'https://bj.lianjia.com/xiaoqu/dongcheng/',
+    u'西城': 'https://bj.lianjia.com/xiaoqu/xicheng/',
     u'朝阳': 'https://bj.lianjia.com/xiaoqu/chaoyang/',
     u'海淀': 'https://bj.lianjia.com/xiaoqu/haidian/',
 #    u'丰台': 'https://bj.lianjia.com/xiaoqu/fengtai/',
@@ -112,7 +112,7 @@ def lianjia_spider_dispatcher():
 
     mkdir4house_url_page()
     # get house 4 sale info
-    '''
+
     download_house_4_sale_url()
     # get region_info
     for k in district_url_map:
@@ -131,7 +131,7 @@ def lianjia_spider_dispatcher():
                 with open(html_path, 'r') as f:
                     l_url = HouseInfoHandler().parse_house_url(f.read(), html_path)
                     download_house_info(l_url)
-    '''
+
     #parse and persist house_info_detail
     info_path = os.path.join(proj_path, 'data/house_detail')
     for file in os.listdir(info_path):
