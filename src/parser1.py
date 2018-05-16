@@ -74,66 +74,67 @@ class HouseInfoHandler:
 
 
     def persis_house_info(self, dict_house_info):
-        db = src.db_helper.DbExeu()
-        info = self.is_exist_in_house_info(dict_house_info['code'])
-        if dict_house_info['is_expire'] == '0':
-            insert_sql = '''insert into tb_house_info(code,total_price,unit_price,room,floor, build_area,huxing,house_area,orientations, buiding_texture,decoration, elevator_house_proportion,heating,is_elevator, property_right,building_type, xiaoqu,region,guapai_time, property_type,last_deal_time, house_usage,deal_year,property_ownership,mortgage,is_expire) 
-                         values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
-            update_sql = '''
-                    UPDATE tb_house_info SET total_price=%s,
-                             unit_price=%s,
-                             room=%s,
-                             floor=%s,
-                             build_area=%s,
-                             huxing=%s,
-                             house_area=%s,
-                             orientations=%s,
-                             buiding_texture=%s,
-                             decoration=%s,
-                             elevator_house_proportion=%s,
-                             heating=%s,
-                             is_elevator=%s,
-                             property_right=%s,
-                             building_type=%s,
-                             xiaoqu=%s,
-                             region=%s,
-                             guapai_time=%s,
-                             property_type=%s,
-                             last_deal_time=%s,
-                             house_usage=%s,
-                             deal_year=%s,
-                             property_ownership=%s,
-                             mortgage=%s,
-                             is_expire=%s
-                    WHERE code=%s'''
-            if info[1] == 0:
-                t_inser = tuple([str(dict_house_info[tb_house_info[x]]) for x in range(len(tb_house_info))])
-                db.trans(insert_sql, [t_inser, ])
-            else:
-                if not info[0][0][2] == dict_house_info['total_price']:
-                    price_change = int(dict_house_info['total_price'])-int(info[0][0][2])
-                    datetime = date.today().isoformat()
-                    timestamp = int(time.time()*1000)
-                    change_insert = '''
-                        insert into tb_price_change(timestamp, code, total_price, price_change, datetime) values (%s, %s, %s, %s, %s)
-                    '''
-                    insert_date=[(timestamp, dict_house_info['code'], dict_house_info['total_price'], price_change, datetime),]
-                    db.trans(change_insert, insert_date)
-                    print('{} change {}'.format(dict_house_info['code'], price_change))
-
-                l_update = []
-                for x in range(len(tb_house_info)):
-                    if not x == 0:
-                        l_update.append(str(dict_house_info[tb_house_info[x]]))
-                l_update.append(str(dict_house_info[tb_house_info[0]]))
-                db.trans(update_sql, [tuple(l_update), ])
-        else:
-            if not info[1] == 0:
-                update_sql='''
-                        UPDATE tb_house_info SET is_expire=%s
+        if not dict_house_info == None:
+            db = src.db_helper.DbExeu()
+            info = self.is_exist_in_house_info(dict_house_info['code'])
+            if dict_house_info['is_expire'] == '0':
+                insert_sql = '''insert into tb_house_info(code,total_price,unit_price,room,floor, build_area,huxing,house_area,orientations, buiding_texture,decoration, elevator_house_proportion,heating,is_elevator, property_right,building_type, xiaoqu,region,guapai_time, property_type,last_deal_time, house_usage,deal_year,property_ownership,mortgage,is_expire) 
+                             values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+                update_sql = '''
+                        UPDATE tb_house_info SET total_price=%s,
+                                 unit_price=%s,
+                                 room=%s,
+                                 floor=%s,
+                                 build_area=%s,
+                                 huxing=%s,
+                                 house_area=%s,
+                                 orientations=%s,
+                                 buiding_texture=%s,
+                                 decoration=%s,
+                                 elevator_house_proportion=%s,
+                                 heating=%s,
+                                 is_elevator=%s,
+                                 property_right=%s,
+                                 building_type=%s,
+                                 xiaoqu=%s,
+                                 region=%s,
+                                 guapai_time=%s,
+                                 property_type=%s,
+                                 last_deal_time=%s,
+                                 house_usage=%s,
+                                 deal_year=%s,
+                                 property_ownership=%s,
+                                 mortgage=%s,
+                                 is_expire=%s
                         WHERE code=%s'''
-                db.trans(update_sql, [(dict_house_info['is_expire'],dict_house_info['code']), ])
-        print('persist data.code = {}'.format(dict_house_info['code']))
+                if info[1] == 0:
+                    t_inser = tuple([str(dict_house_info[tb_house_info[x]]) for x in range(len(tb_house_info))])
+                    db.trans(insert_sql, [t_inser, ])
+                else:
+                    if not info[0][0][2] == dict_house_info['total_price']:
+                        price_change = int(dict_house_info['total_price'])-int(info[0][0][2])
+                        datetime = date.today().isoformat()
+                        timestamp = int(time.time()*1000)
+                        change_insert = '''
+                            insert into tb_price_change(timestamp, code, total_price, price_change, datetime) values (%s, %s, %s, %s, %s)
+                        '''
+                        insert_date=[(timestamp, dict_house_info['code'], dict_house_info['total_price'], price_change, datetime),]
+                        db.trans(change_insert, insert_date)
+                        print('{} change {}'.format(dict_house_info['code'], price_change))
+
+                    l_update = []
+                    for x in range(len(tb_house_info)):
+                        if not x == 0:
+                            l_update.append(str(dict_house_info[tb_house_info[x]]))
+                    l_update.append(str(dict_house_info[tb_house_info[0]]))
+                    db.trans(update_sql, [tuple(l_update), ])
+            else:
+                if not info[1] == 0:
+                    update_sql='''
+                            UPDATE tb_house_info SET is_expire=%s
+                            WHERE code=%s'''
+                    db.trans(update_sql, [(dict_house_info['is_expire'],dict_house_info['code']), ])
+            print('persist data.code = {}'.format(dict_house_info['code']))
 
     def parse_house_url(self, html, path):
         try:
@@ -151,72 +152,81 @@ class HouseInfoHandler:
             raise e
 
     def parse_house_info(self, html, path):
-        soup = BeautifulSoup(html, 'html.parser')
-        is_expire = soup.find('div', 'title-wrapper').find('span').string
-        dict_house_info = dict()
-        overview = soup.find('div', 'overview').find('div', 'content')
-        basic = soup.find('div', 'm-content').find('div', 'base')
-        transaction = soup.find('div', 'm-content').find('div', 'transaction')
-        if is_expire == '已下架':
-            dict_house_info['is_expire'] = '1'
-            dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
-        else:
-            # fill dict_house_info
-            #not下架
-            dict_house_info['is_expire'] = '0'
-            # code for 房屋代码
-            dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
-            # total_price for 总价
-            dict_house_info['total_price'] = overview.find('div', 'price ').find_all('span')[0].string
-            # unit_price for 单价
-            dict_house_info['unit_price'] = overview.find('div', 'price ').find_all('span')[3].contents[0]
-            # room like 两室一厅
-            dict_house_info['room'] = basic.find_all('li')[0].contents[1]
-            # floor like 顶层(共13层)
-            dict_house_info['floor'] = basic.find_all('li')[1].contents[1]
-            # biuld_area for 建筑面积
-            dict_house_info['build_area'] = basic.find_all('li')[2].contents[1]
-            # huxing like 平层
-            dict_house_info['huxing'] = basic.find_all('li')[3].contents[1]
-            # house_area for 套内面积
-            dict_house_info['house_area'] = basic.find_all('li')[4].contents[1]
-            # orientations for 朝向
-            dict_house_info['orientations'] = basic.find_all('li')[6].contents[1]
-            # biuding_texture like 材质
-            dict_house_info['buiding_texture'] = basic.find_all('li')[7].contents[1]
-            # decoration like 精装
-            dict_house_info['decoration'] = basic.find_all('li')[8].contents[1]
-            # elevator_house_proportion like 一梯三户
-            dict_house_info['elevator_house_proportion'] = basic.find_all('li')[9].contents[1]
-            # heating like 自供暖
-            dict_house_info['heating'] = basic.find_all('li')[10].contents[1]
-            # is_elevator like 有电梯
-            dict_house_info['is_elevator'] = basic.find_all('li')[11].contents[1]
-            # property_right like 70年
-            dict_house_info['property_right'] = basic.find_all('li')[12].contents[1]
-            # building_type like 2003年建塔楼
-            dict_house_info['building_type'] = overview.find('div', 'area').find('div', 'subInfo').string
-            # xiaoqu for 小区
-            dict_house_info['xiaoqu'] = overview.find('div', 'communityName').a.string
-            # region like 清河
-            dict_house_info['region'] = overview.find('div', 'areaName').find_all('a')[1].string
+        print(path)
+        try:
+            soup = BeautifulSoup(html, 'html.parser')
+            t = soup.find('div', 'title-wrapper').find('h1').find('span')
+            if not t == None:
+                is_expire = t.string
+            else:
+                is_expire = 0
+            dict_house_info = dict()
+            overview = soup.find('div', 'overview').find('div', 'content')
+            basic = soup.find('div', 'm-content').find('div', 'base')
+            transaction = soup.find('div', 'm-content').find('div', 'transaction')
+            if is_expire == '已下架':
+                dict_house_info['is_expire'] = '1'
+                dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
+            else:
+                # fill dict_house_info
+                #not下架
+                dict_house_info['is_expire'] = '0'
+                # code for 房屋代码
+                dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
+                # total_price for 总价
+                dict_house_info['total_price'] = overview.find('div', 'price ').find_all('span')[0].string
+                # unit_price for 单价
+                dict_house_info['unit_price'] = overview.find('div', 'price ').find_all('span')[3].contents[0]
+                # room like 两室一厅
+                dict_house_info['room'] = basic.find_all('li')[0].contents[1]
+                # floor like 顶层(共13层)
+                dict_house_info['floor'] = basic.find_all('li')[1].contents[1]
+                # biuld_area for 建筑面积
+                dict_house_info['build_area'] = basic.find_all('li')[2].contents[1]
+                # huxing like 平层
+                dict_house_info['huxing'] = basic.find_all('li')[3].contents[1]
+                # house_area for 套内面积
+                dict_house_info['house_area'] = basic.find_all('li')[4].contents[1]
+                # orientations for 朝向
+                dict_house_info['orientations'] = basic.find_all('li')[6].contents[1]
+                # biuding_texture like 材质
+                dict_house_info['buiding_texture'] = basic.find_all('li')[7].contents[1]
+                # decoration like 精装
+                dict_house_info['decoration'] = basic.find_all('li')[8].contents[1]
+                # elevator_house_proportion like 一梯三户
+                dict_house_info['elevator_house_proportion'] = basic.find_all('li')[9].contents[1]
+                # heating like 自供暖
+                dict_house_info['heating'] = basic.find_all('li')[10].contents[1]
+                # is_elevator like 有电梯
+                dict_house_info['is_elevator'] = basic.find_all('li')[11].contents[1]
+                # property_right like 70年
+                dict_house_info['property_right'] = basic.find_all('li')[12].contents[1]
+                # building_type like 2003年建塔楼
+                dict_house_info['building_type'] = overview.find('div', 'area').find('div', 'subInfo').string
+                # xiaoqu for 小区
+                dict_house_info['xiaoqu'] = overview.find('div', 'communityName').a.string
+                # region like 清河
+                dict_house_info['region'] = overview.find('div', 'areaName').find_all('a')[1].string
 
-            # guapai_time is 挂牌时间
-            dict_house_info['guapai_time'] = transaction.find_all('li')[0].find_all('span')[1].string
-            # property_type like 商品房
-            dict_house_info['property_type'] = transaction.find_all('li')[1].find_all('span')[1].string
-            # last_deal_time is 上次交易
-            dict_house_info['last_deal_time'] = transaction.find_all('li')[2].find_all('span')[1].string
-            # house_usage is 房屋用途
-            dict_house_info['house_usage'] = transaction.find_all('li')[3].find_all('span')[1].string
-            # deal_year is 房屋年限
-            dict_house_info['deal_year'] = transaction.find_all('li')[4].find_all('span')[1].string
-            # property_ownership is 产权所属
-            dict_house_info['property_ownership'] = transaction.find_all('li')[5].find_all('span')[1].string
-            # mortgage is 抵押信息
-            dict_house_info['mortgage'] = transaction.find_all('li')[6].find_all('span')[1].attrs['title']
-            print('parse {}'.format(path))
-        return dict_house_info
+                # guapai_time is 挂牌时间
+                dict_house_info['guapai_time'] = transaction.find_all('li')[0].find_all('span')[1].string
+                # property_type like 商品房
+                dict_house_info['property_type'] = transaction.find_all('li')[1].find_all('span')[1].string
+                # last_deal_time is 上次交易
+                dict_house_info['last_deal_time'] = transaction.find_all('li')[2].find_all('span')[1].string
+                # house_usage is 房屋用途
+                dict_house_info['house_usage'] = transaction.find_all('li')[3].find_all('span')[1].string
+                # deal_year is 房屋年限
+                dict_house_info['deal_year'] = transaction.find_all('li')[4].find_all('span')[1].string
+                # property_ownership is 产权所属
+                dict_house_info['property_ownership'] = transaction.find_all('li')[5].find_all('span')[1].string
+                # mortgage is 抵押信息
+                dict_house_info['mortgage'] = transaction.find_all('li')[6].find_all('span')[1].attrs['title']
+                print('parse {}'.format(path))
+            return dict_house_info
+        except AttributeError as e:
+            print(e)
+            return None
 
 
 class XiaoquInfoHandler:
@@ -235,9 +245,9 @@ if __name__ == '__main__':
     with open(os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_url(f.read(),
                                                os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'))
-    with open(os.path.join(proj_path, u'data/house_detail/101091836246.html'), 'r') as f:
+    with open(os.path.join(proj_path, u'data/house_detail/101102360166.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_info(f.read(),
-                                                os.path.join(proj_path, u'data/house_detail/101091836246.html'))
+                                                os.path.join(proj_path, u'data/house_detail/101102360166.html'))
         HouseInfoHandler().persis_house_info(r)
         print(r)
     with open(os.path.join(proj_path, u'data/朝阳/house_url/house_url_page1.html'), 'r') as f:

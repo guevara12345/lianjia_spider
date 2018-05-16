@@ -21,8 +21,8 @@ def select():
         WHERE t.region = s.region
             AND house_usage = '普通住宅'
             AND s.is_too_far = 0
-            AND t.total_price>'650'
-            AND t.total_price<'850'
+            AND t.total_price>='650'
+            AND t.total_price<='900'
             AND t.is_expire='0'
             AND (s.district ='朝阳' OR s.district ='海淀')
         ORDER BY region, xiaoqu
@@ -39,7 +39,7 @@ def select():
             , CONCAT('https://bj.lianjia.com/ershoufang/', t.code, '.html')
         FROM tb_price_change t, tb_house_info s
         WHERE t.code = s.code
-        ORDER BY s.region, s.xiaoqu, t.code
+        ORDER BY s.region, s.xiaoqu, t.code, t.datetime
     '''
     r = db_hanlder.return_many_without_para(sql)
     with open(os.path.join(proj_path, 'result/price_change_{}.csv'.format(time_str)), 'w') as f:

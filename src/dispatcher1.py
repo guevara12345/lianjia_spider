@@ -11,7 +11,7 @@ from src.downloader1 import HtmlDownloader
 from src.parser1 import HouseInfoHandler, XiaoquInfoHandler, RegionInfoHandler
 
 
-max_price = 850
+max_price = 900
 min_price = 650
 build_age = {'0-5': 'y1', '0-10': 'y2', '0-15': 'y3', '0-20': 'y4', }
 house_type = {'1': 'l1', '2': 'l2', '3': 'l3', '4': 'l4'}
