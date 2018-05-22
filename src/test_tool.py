@@ -22,7 +22,7 @@ def select():
             AND house_usage = '普通住宅'
             AND s.is_too_far = 0
             AND t.total_price>='650'
-            AND t.total_price<='900'
+            AND t.total_price<='850'
             AND t.is_expire='0'
             AND (s.district ='朝阳' OR s.district ='海淀')
         ORDER BY region, xiaoqu
@@ -48,17 +48,27 @@ def select():
         f_csv.writerow(['region','xiaoqu','price_change','total_price','datetime','code'])
         f_csv.writerows(i)
 
+    sql = '''
+            SELECT t.xiaoqu, count(t.code)
+            FROM tb_house_info t, tb_region_info s
+            WHERE t.region = s.region
+                AND house_usage = '普通住宅'
+                AND s.is_too_far = 0
+                AND t.total_price>='650'
+                AND t.total_price<='850'
+                AND t.is_expire='0'
+                AND (s.district ='朝阳' OR s.district ='海淀')
+            group by t.xiaoqu
+            order by count(t.code)
+            '''
+    r = db_hanlder.return_many_without_para(sql)
+    for x in r[0]:
+        print(x)
 
 def select_test():
     db_hanlder = src.db_helper.DbExeu()
     sql = '''select * from tb_region_info'''
     r = db_hanlder.return_many_without_para(sql)
-    print(r)
-    sql = '''select * from tb_region_info where region=%s'''
-    r = db_hanlder.return_many_with_para(sql, ('三里屯'))
-    print(r)
-    sql = '''select * from tb_house_info where code=%s'''
-    r = db_hanlder.return_many_with_para(sql, ('101102646140'))
     print(r)
     sql = '''
         SELECT t.code, t.total_price, t.price_change, t.datetime, s.xiaoqu
@@ -73,4 +83,3 @@ def select_test():
 
 if __name__=='__main__':
     select()
-    select_test()

@@ -6,29 +6,27 @@ import os
 from datetime import date
 import time
 
-
 import src.db_helper
 
-
-tb_house_info = ['code','total_price','unit_price','room',
-                 'floor','build_area','huxing','house_area','orientations',
-                 'buiding_texture','decoration','elevator_house_proportion','heating','is_elevator',
-                 'property_right','building_type','xiaoqu','region','guapai_time',
-                 'property_type','last_deal_time','house_usage','deal_year','property_ownership',
+tb_house_info = ['code', 'total_price', 'unit_price', 'room',
+                 'floor', 'build_area', 'huxing', 'house_area', 'orientations',
+                 'buiding_texture', 'decoration', 'elevator_house_proportion', 'heating', 'is_elevator',
+                 'property_right', 'building_type', 'xiaoqu', 'region', 'guapai_time',
+                 'property_type', 'last_deal_time', 'house_usage', 'deal_year', 'property_ownership',
                  'mortgage', 'is_expire']
 proj_path = os.path.abspath('..')
 
 
 class RegionInfoHandler:
     chaoyang_far_region = ['北工大', '百子湾', '成寿寺', '常营', '朝阳门外',
-                          'CBD', '朝青', '朝阳公园', '东坝', '大望路',
-                          '东大桥', '大山子', '豆各庄', '定福庄', '方庄',
-                          '垡头', '广渠门', '高碑店', '国展', '甘露园',
-                          '管庄', '欢乐谷', '红庙', '华威桥', '酒仙桥',
-                          '劲松', '建国门外', '农展馆', '潘家园', '石佛营',
-                          '十里堡', '首都机场', '双井', '十里河', '十八里店',
-                          '双桥', '三里屯', '四惠', '通州北苑', '团结湖',
-                          '太阳宫', '甜水园', '望京', '西坝河', '燕莎', '中央别墅区', '朝阳其它']
+                           'CBD', '朝青', '朝阳公园', '东坝', '大望路',
+                           '东大桥', '大山子', '豆各庄', '定福庄', '方庄',
+                           '垡头', '广渠门', '高碑店', '国展', '甘露园',
+                           '管庄', '欢乐谷', '红庙', '华威桥', '酒仙桥',
+                           '劲松', '建国门外', '农展馆', '潘家园', '石佛营',
+                           '十里堡', '首都机场', '双井', '十里河', '十八里店',
+                           '双桥', '三里屯', '四惠', '通州北苑', '团结湖',
+                           '太阳宫', '甜水园', '望京', '西坝河', '燕莎', '中央别墅区', '朝阳其它']
 
     def parse_region(self, html, path):
         district = re.split(r'/', path)[6]
@@ -51,12 +49,12 @@ class RegionInfoHandler:
                              values (%s,%s,%s)'''
         for i in paras:
             if db.return_many_with_para(exists_sql, i[0])[1] == 0:
-                db.trans(insert_sql, [i,])
+                db.trans(insert_sql, [i, ])
         print('persist {} region info done'.format(paras[0][1]))
 
 
 class HouseInfoHandler:
-    #parse https://bj.lianjia.com/ershoufang/haidian/ for max_page_num
+    # parse https://bj.lianjia.com/ershoufang/haidian/ for max_page_num
     def parse_max_page_num(self, html, path):
         soup = BeautifulSoup(html, 'html.parser')
         p_list = soup.find_all('div', 'page-box house-lst-page-box')
@@ -70,8 +68,6 @@ class HouseInfoHandler:
         db = src.db_helper.DbExeu()
         exists_sql = '''select * from tb_house_info where code=%s'''
         return db.return_many_with_para(exists_sql, code)
-
-
 
     def persis_house_info(self, dict_house_info):
         if not dict_house_info == None:
@@ -112,13 +108,15 @@ class HouseInfoHandler:
                     db.trans(insert_sql, [t_inser, ])
                 else:
                     if not info[0][0][2] == dict_house_info['total_price']:
-                        price_change = int(dict_house_info['total_price'])-int(info[0][0][2])
+                        price_change = int(dict_house_info['total_price']) - int(info[0][0][2])
                         datetime = date.today().isoformat()
-                        timestamp = int(time.time()*1000)
+                        timestamp = int(time.time() * 1000)
                         change_insert = '''
                             insert into tb_price_change(timestamp, code, total_price, price_change, datetime) values (%s, %s, %s, %s, %s)
                         '''
-                        insert_date=[(timestamp, dict_house_info['code'], dict_house_info['total_price'], price_change, datetime),]
+                        insert_date = [(
+                                       timestamp, dict_house_info['code'], dict_house_info['total_price'], price_change,
+                                       datetime), ]
                         db.trans(change_insert, insert_date)
                         print('{} change {}'.format(dict_house_info['code'], price_change))
 
@@ -130,10 +128,10 @@ class HouseInfoHandler:
                     db.trans(update_sql, [tuple(l_update), ])
             else:
                 if not info[1] == 0:
-                    update_sql='''
+                    update_sql = '''
                             UPDATE tb_house_info SET is_expire=%s
                             WHERE code=%s'''
-                    db.trans(update_sql, [(dict_house_info['is_expire'],dict_house_info['code']), ])
+                    db.trans(update_sql, [(dict_house_info['is_expire'], dict_house_info['code']), ])
             print('persist data.code = {}'.format(dict_house_info['code']))
 
     def parse_house_url(self, html, path):
@@ -169,7 +167,7 @@ class HouseInfoHandler:
                 dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
             else:
                 # fill dict_house_info
-                #not下架
+                # not下架
                 dict_house_info['is_expire'] = '0'
                 # code for 房屋代码
                 dict_house_info['code'] = overview.find('div', 'houseRecord').find_all('span')[1].contents[0]
@@ -245,13 +243,13 @@ if __name__ == '__main__':
     with open(os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_url(f.read(),
                                                os.path.join(proj_path, u'data/海淀/house_url/house_url_page1.html'))
-    with open(os.path.join(proj_path, u'data/house_detail/101102360166.html'), 'r') as f:
+    with open(os.path.join(proj_path, u'data/house_detail/101102870129.html'), 'r') as f:
         r = HouseInfoHandler().parse_house_info(f.read(),
-                                                os.path.join(proj_path, u'data/house_detail/101102360166.html'))
+                                                os.path.join(proj_path, u'data/house_detail/101102870129.html'))
         HouseInfoHandler().persis_house_info(r)
         print(r)
     with open(os.path.join(proj_path, u'data/朝阳/house_url/house_url_page1.html'), 'r') as f:
         r = RegionInfoHandler().parse_region(f.read(),
                                              os.path.join(proj_path, u'data/朝阳/house_url/house_url_page1.html'))
         RegionInfoHandler().persist_region(r)
-        #print(r)
+        # print(r)
