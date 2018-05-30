@@ -64,6 +64,7 @@ def select():
     r = db_hanlder.return_many_without_para(sql)
     for x in r[0]:
         print(x)
+    print(time.strftime("finish at %Y-%b-%d %H:%M:%S"))
 
 def select_test():
     db_hanlder = src.db_helper.DbExeu()
